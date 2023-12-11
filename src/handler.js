@@ -4,14 +4,20 @@ require('dotenv').config();
 const fs = require('fs');
 const util = require('util');
 const client  = new TextToSpeech.TextToSpeechClient();
+
 //name and key to access google cloud storage
 const projectID = process.env.PROJECT_ID
 const keyFileName = process.env.KEYFILENAME
 const storage = new Storage({projectID, keyFileName});
 const Bucket_name = process.env.BUCKET_NAME;
+
 //output name in my local folder
 const date = Date.now();
-const file_name = date + ".mp3" 
+const file_name = date + ".mp3"
+
+// NewsApi
+const NewsAPI = require('newsapi');
+const newsapi = new NewsAPI('b51bf73b4e204ae7ae34a55dac9a5c76');
 
 
 const quickStart = async(request, h) => {
@@ -55,9 +61,19 @@ const quickStart = async(request, h) => {
       url: `https://storage.googleapis.com/${Bucket_name}/${file_name}`
     }
     return h.response(responseData).header('Content-Type', 'application/json').code(200);
-   
-  
+  }
+
+  async function getTopHeadlines() {
+    try {
+      const response = await newsapi.v2.topHeadlines({
+        country: 'id',
+        category: 'health'
+      });
+      return response;
+    } catch (error) {
+      throw error;
+    }
   }
   
   
- module.exports = quickStart;
+ module.exports = {quickStart , getTopHeadlines};

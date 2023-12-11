@@ -1,5 +1,6 @@
 const Hapi = require('@hapi/hapi');
-const quickStart = require('./src/handler');
+const {quickStart, getTopHeadlines} = require('./src/handler');
+
 
 const init = async () => {
 
@@ -16,6 +17,18 @@ const init = async () => {
                     message: 'Hello World!'
                 }
             }
+        },
+        {
+            method: "GET",
+            path: '/top-headlines-health-news',
+            handler: async (request, h) => {
+                try {
+                  const headlines = await getTopHeadlines();
+                  return headlines;
+                } catch (error) {
+                  return h.response({ error: 'Internal Server Error' }).code(500);
+                }
+            },
         },
         {
             method: "POST",
