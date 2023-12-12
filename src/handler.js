@@ -13,7 +13,9 @@ const Bucket_name = process.env.BUCKET_NAME;
 
 //output name in my local folder
 const date = Date.now();
-const file_name = date + ".mp3"
+const uniqueId = Math.floor(Math.random() * 1000);
+const file_name = `${date}_${uniqueId}.mp3`;
+// const file_name = date + ".mp3"
 
 // NewsApi
 const NewsAPI = require('newsapi');
@@ -58,9 +60,21 @@ const quickStart = async(request, h) => {
       console.log('Error', error)
     }
     const responseData = {
-      url: `https://storage.googleapis.com/${Bucket_name}/${file_name}`
+      status : "success",
+      message : "berhasil menambahkan suara",
+      data : {
+        url: `https://storage.googleapis.com/${Bucket_name}/${file_name}`
+      }
     }
-    return h.response(responseData).header('Content-Type', 'application/json').code(200);
+    if(writeFile){
+      return h.response(responseData).header('Content-Type', 'application/json').code(200);
+    }else{
+      return h.response({
+        status : "fail",
+        message : "gagal mengubah suara",
+      }).code(404);
+    }
+   
   }
 
   async function getTopHeadlines() {
